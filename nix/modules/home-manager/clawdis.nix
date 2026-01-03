@@ -15,7 +15,7 @@ let
       enabled = true;
       tokenFile = inst.providers.telegram.botTokenFile;
       allowFrom = inst.providers.telegram.allowFrom;
-      requireMention = inst.providers.telegram.requireMention;
+      groups = inst.providers.telegram.groups;
     };
   };
 
@@ -24,9 +24,6 @@ let
       queue = {
         mode = inst.routing.queue.mode;
         bySurface = inst.routing.queue.bySurface;
-      };
-      groupChat = {
-        requireMention = inst.routing.groupChat.requireMention;
       };
     };
   };
@@ -79,6 +76,18 @@ let
         description = "Gateway port used by the Clawdis desktop app.";
       };
 
+      gatewayPath = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        description = "Local path to Clawdis gateway source (dev only).";
+      };
+
+      gatewayPnpmDepsHash = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = lib.fakeHash;
+        description = "pnpmDeps hash for local gateway builds (omit to let Nix suggest the correct hash).";
+      };
+
       providers.telegram = {
         enable = lib.mkOption {
           type = lib.types.bool;
@@ -98,11 +107,31 @@ let
           description = "Allowed Telegram chat IDs.";
         };
 
-        requireMention = lib.mkOption {
-          type = lib.types.bool;
-          default = false;
-          description = "Require @mention in Telegram groups.";
+        
+
+        groups = lib.mkOption {
+          type = lib.types.attrs;
+          default = {};
+          description = "Per-group Telegram overrides (mirrors upstream telegram.groups config).";
         };
+      };
+
+      plugins = lib.mkOption {
+        type = lib.types.listOf (lib.types.submodule {
+          options = {
+            source = lib.mkOption {
+              type = lib.types.str;
+              description = "Plugin source pointer (e.g., github:owner/repo or path:/...).";
+            };
+            config = lib.mkOption {
+              type = lib.types.attrs;
+              default = {};
+              description = "Plugin-specific configuration (env/files/etc).";
+            };
+          };
+        });
+        default = cfg.plugins;
+        description = "Plugins enabled for this instance.";
       };
 
       providers.anthropic = {
@@ -131,11 +160,7 @@ let
         };
       };
 
-      routing.groupChat.requireMention = lib.mkOption {
-        type = lib.types.bool;
-        default = false;
-        description = "Require mention for group chat activation.";
-      };
+      
 
       launchd.enable = lib.mkOption {
         type = lib.types.bool;
@@ -185,7 +210,7 @@ let
     };
   };
 
-  legacyInstance = {
+  defaultInstance = {
     enable = cfg.enable;
     package = cfg.package;
     stateDir = cfg.stateDir;
@@ -196,6 +221,7 @@ let
     providers = cfg.providers;
     routing = cfg.routing;
     launchd = cfg.launchd;
+    plugins = cfg.plugins;
     configOverrides = {};
     appDefaults = {
       enable = true;
@@ -211,11 +237,311 @@ let
 
   instances = if cfg.instances != {}
     then cfg.instances
-    else lib.optionalAttrs cfg.enable { default = legacyInstance; };
+    else lib.optionalAttrs cfg.enable { default = defaultInstance; };
 
   enabledInstances = lib.filterAttrs (_: inst: inst.enable) instances;
+  managedSkillsDir = "${homeDir}/.clawdis/skills";
 
+  documentsEnabled = cfg.documents != null;
+
+  resolvePath = p:
+    if lib.hasPrefix "~/" p then
+      "${homeDir}/${lib.removePrefix "~/" p}"
+    else
+      p;
+
+  toRelative = p:
+    if lib.hasPrefix "${homeDir}/" p then
+      lib.removePrefix "${homeDir}/" p
+    else
+      p;
+
+  instanceWorkspaceDirs = lib.mapAttrsToList (_: inst: resolvePath inst.workspaceDir) enabledInstances;
+
+  documentsAssertions = lib.optionals documentsEnabled [
+    {
+      assertion = builtins.pathExists cfg.documents;
+      message = "programs.clawdis.documents must point to an existing directory.";
+    }
+    {
+      assertion = builtins.pathExists (cfg.documents + "/AGENTS.md");
+      message = "Missing AGENTS.md in programs.clawdis.documents.";
+    }
+    {
+      assertion = builtins.pathExists (cfg.documents + "/SOUL.md");
+      message = "Missing SOUL.md in programs.clawdis.documents.";
+    }
+    {
+      assertion = builtins.pathExists (cfg.documents + "/TOOLS.md");
+      message = "Missing TOOLS.md in programs.clawdis.documents.";
+    }
+  ];
+
+  documentsGuard =
+    lib.optionalString documentsEnabled (
+      let
+        guardLine = file: ''
+          if [ -e "${file}" ] && [ ! -L "${file}" ]; then
+            echo "Clawdis documents are managed by Nix. Please adopt ${file} into your documents directory and re-run." >&2
+            exit 1
+          fi
+        '';
+        guardForDir = dir: ''
+          ${guardLine "${dir}/AGENTS.md"}
+          ${guardLine "${dir}/SOUL.md"}
+          ${guardLine "${dir}/TOOLS.md"}
+        '';
+      in
+        lib.concatStringsSep "\n" (map guardForDir instanceWorkspaceDirs)
+    );
+
+  toolsReport =
+    if documentsEnabled then
+      let
+          pluginLinesFor = instName: inst:
+            let
+              plugins = resolvedPluginsByInstance.${instName} or [];
+              render = p: "- " + p.name + " (" + p.source + ")";
+              lines = if plugins == [] then [ "- (none)" ] else map render plugins;
+            in
+              [
+                ""
+                "### Instance: ${instName}"
+              ] ++ lines;
+        reportLines =
+          [
+            "<!-- BEGIN NIX-REPORT -->"
+            ""
+            "## Nix-managed plugin report"
+            ""
+            "Plugins enabled per instance (last-wins on name collisions):"
+          ]
+          ++ lib.concatLists (lib.mapAttrsToList pluginLinesFor enabledInstances)
+          ++ [
+            ""
+            "Tools: batteries-included toolchain + plugin-provided CLIs."
+            ""
+            "<!-- END NIX-REPORT -->"
+          ];
+        reportText = lib.concatStringsSep "\n" reportLines;
+      in
+        pkgs.writeText "clawdis-tools-report.md" reportText
+    else
+      null;
+
+  toolsWithReport =
+    if documentsEnabled then
+      pkgs.runCommand "clawdis-tools-with-report.md" {} ''
+        cat ${cfg.documents + "/TOOLS.md"} > $out
+        echo "" >> $out
+        cat ${toolsReport} >> $out
+      ''
+    else
+      null;
+
+  documentsFiles =
+    if documentsEnabled then
+      let
+        mkDocFiles = dir: {
+          "${toRelative (dir + "/AGENTS.md")}" = {
+            source = cfg.documents + "/AGENTS.md";
+          };
+          "${toRelative (dir + "/SOUL.md")}" = {
+            source = cfg.documents + "/SOUL.md";
+          };
+          "${toRelative (dir + "/TOOLS.md")}" = {
+            source = toolsWithReport;
+          };
+        };
+      in
+        lib.mkMerge (map mkDocFiles instanceWorkspaceDirs)
+    else
+      {};
+
+  resolvePlugin = plugin: let
+    flake = builtins.getFlake plugin.source;
+    clawdisPlugin =
+      if flake ? clawdisPlugin then flake.clawdisPlugin
+      else throw "clawdisPlugin missing in ${plugin.source}";
+    needs = clawdisPlugin.needs or {};
+  in {
+    source = plugin.source;
+    name = clawdisPlugin.name or (throw "clawdisPlugin.name missing in ${plugin.source}");
+    skills = clawdisPlugin.skills or [];
+    packages = clawdisPlugin.packages or [];
+    needs = {
+      stateDirs = needs.stateDirs or [];
+      requiredEnv = needs.requiredEnv or [];
+    };
+    config = plugin.config or {};
+  };
+
+  resolvedPluginsByInstance =
+    lib.mapAttrs (instName: inst:
+      let
+        resolved = map resolvePlugin inst.plugins;
+        counts = lib.foldl' (acc: p:
+          acc // { "${p.name}" = (acc.${p.name} or 0) + 1; }
+        ) {} resolved;
+        duplicates = lib.attrNames (lib.filterAttrs (_: v: v > 1) counts);
+        byName = lib.foldl' (acc: p: acc // { "${p.name}" = p; }) {} resolved;
+        ordered = lib.attrValues byName;
+      in
+        if duplicates == []
+        then ordered
+        else lib.warn
+          "programs.clawdis.instances.${instName}: duplicate plugin names detected (${lib.concatStringsSep ", " duplicates}); last entry wins."
+          ordered
+    ) enabledInstances;
+
+  pluginPackagesFor = instName:
+    lib.flatten (map (p: p.packages) (resolvedPluginsByInstance.${instName} or []));
+
+  pluginStateDirsFor = instName:
+    let
+      dirs = lib.flatten (map (p: p.needs.stateDirs) (resolvedPluginsByInstance.${instName} or []));
+    in
+      map (dir: resolvePath ("~/" + dir)) dirs;
+
+  pluginEnvFor = instName:
+    let
+      entries = resolvedPluginsByInstance.${instName} or [];
+      toPairs = p:
+        let
+          env = (p.config.env or {});
+          required = p.needs.requiredEnv;
+        in
+          map (k: { key = k; value = env.${k} or ""; plugin = p.name; }) required;
+    in
+      lib.flatten (map toPairs entries);
+
+  pluginEnvAllFor = instName:
+    let
+      entries = resolvedPluginsByInstance.${instName} or [];
+      toPairs = p:
+        let env = (p.config.env or {});
+        in map (k: { key = k; value = env.${k}; plugin = p.name; }) (lib.attrNames env);
+    in
+      lib.flatten (map toPairs entries);
+
+  pluginAssertions =
+    lib.flatten (lib.mapAttrsToList (instName: inst:
+      let
+        plugins = resolvedPluginsByInstance.${instName} or [];
+        envFor = p: (p.config.env or {});
+        missingFor = p:
+          lib.filter (req: !(envFor p ? req)) p.needs.requiredEnv;
+        configMissingStateDir = p:
+          (p.config.settings or {}) != {} && (p.needs.stateDirs or []) == [];
+        mkAssertion = p:
+          let missing = missingFor p;
+          in {
+            assertion = missing == [];
+            message = "programs.clawdis.instances.${instName}: plugin ${p.name} missing required env: ${lib.concatStringsSep \", \" missing}";
+          };
+        mkConfigAssertion = p: {
+          assertion = !(configMissingStateDir p);
+          message = "programs.clawdis.instances.${instName}: plugin ${p.name} provides settings but declares no stateDirs (needed for config.json).";
+        };
+      in
+        (map mkAssertion plugins) ++ (map mkConfigAssertion plugins)
+    ) enabledInstances);
+
+  pluginSkillsFiles =
+    let
+      skillEntriesFor = p:
+        map (skillPath: {
+          name = ".clawdis/skills/${p.name}/${builtins.baseNameOf skillPath}";
+          value = { source = skillPath; recursive = true; };
+        }) p.skills;
+      allEntries =
+        lib.flatten (lib.concatLists (lib.mapAttrsToList (_: plugins: map skillEntriesFor plugins) resolvedPluginsByInstance));
+    in
+      lib.listToAttrs (lib.flatten allEntries);
+
+  pluginGuards =
+    let
+      renderCheck = entry: ''
+        if [ -z "${entry.value}" ]; then
+          echo "Missing env ${entry.key} for plugin ${entry.plugin} in instance ${entry.instance}." >&2
+          exit 1
+        fi
+        if [ ! -f "${entry.value}" ] || [ ! -s "${entry.value}" ]; then
+          echo "Required file for ${entry.key} not found or empty: ${entry.value} (plugin ${entry.plugin}, instance ${entry.instance})." >&2
+          exit 1
+        fi
+      '';
+      entriesForInstance = instName:
+        map (entry: entry // { instance = instName; }) (pluginEnvFor instName);
+      entries = lib.flatten (map entriesForInstance (lib.attrNames enabledInstances));
+    in
+      lib.concatStringsSep "\n" (map renderCheck entries);
+
+  pluginConfigFiles =
+    let
+      entryFor = instName: inst:
+      let
+        plugins = resolvedPluginsByInstance.${instName} or [];
+        mkEntries = p:
+          let
+            cfg = p.config.settings or {};
+            dir =
+              if (p.needs.stateDirs or []) == []
+              then null
+              else lib.head (p.needs.stateDirs or []);
+          in
+            if cfg == {} then
+              []
+            else
+                (if dir == null then
+                  throw "plugin ${p.name} provides settings but no stateDirs are defined"
+                else [
+                  {
+                    name = toRelative (resolvePath ("~/" + dir + "/config.json"));
+                    value = { text = builtins.toJSON cfg; };
+                  }
+                ]);
+        in
+          lib.flatten (map mkEntries plugins);
+      entries = lib.flatten (lib.mapAttrsToList entryFor enabledInstances);
+    in
+      lib.listToAttrs entries;
+
+  pluginSkillAssertions =
+    let
+      skillTargets =
+        lib.flatten (lib.concatLists (lib.mapAttrsToList (_: plugins:
+          map (p:
+            map (skillPath:
+              ".clawdis/skills/${p.name}/${builtins.baseNameOf skillPath}"
+            ) p.skills
+          ) plugins
+        ) resolvedPluginsByInstance));
+      counts = lib.foldl' (acc: path:
+        acc // { "${path}" = (acc.${path} or 0) + 1; }
+      ) {} skillTargets;
+      duplicates = lib.attrNames (lib.filterAttrs (_: v: v > 1) counts);
+    in
+      if duplicates == [] then [] else [
+        {
+          assertion = false;
+          message = "Duplicate skill paths detected: ${lib.concatStringsSep ", " duplicates}";
+        }
+      ];
   mkInstanceConfig = name: inst: let
+    gatewayPackage =
+      if inst.gatewayPath != null then
+        pkgs.callPackage ../../packages/clawdis-gateway.nix {
+          src = builtins.path {
+            path = inst.gatewayPath;
+            name = "clawdis-gateway-src";
+          };
+          pnpmDepsHash = inst.gatewayPnpmDepsHash;
+        }
+      else
+        inst.package;
+    pluginPackages = pluginPackagesFor name;
+    pluginEnvAll = pluginEnvAllFor name;
     baseConfig = mkBaseConfig inst.workspaceDir;
     mergedConfig = lib.recursiveUpdate
       (lib.recursiveUpdate baseConfig (lib.recursiveUpdate (mkTelegramConfig inst) (mkRoutingConfig inst)))
@@ -223,6 +549,12 @@ let
     configJson = builtins.toJSON mergedConfig;
     gatewayWrapper = pkgs.writeShellScriptBin "clawdis-gateway-${name}" ''
       set -euo pipefail
+
+      if [ "${toString (pluginPackages != [])}" = "true" ]; then
+        export PATH="${lib.makeBinPath pluginPackages}:$PATH"
+      fi
+
+      ${lib.concatStringsSep "\n" (map (entry: "export ${entry.key}=\"${entry.value}\"") pluginEnvAll)}
 
       if [ -n "${inst.providers.anthropic.apiKeyFile}" ]; then
         if [ ! -f "${inst.providers.anthropic.apiKeyFile}" ]; then
@@ -237,7 +569,7 @@ let
         export ANTHROPIC_API_KEY
       fi
 
-      exec "${inst.package}/bin/clawdis" "$@"
+      exec "${gatewayPackage}/bin/clawdis" "$@"
     '';
   in {
     homeFile = {
@@ -284,7 +616,7 @@ let
       };
     };
 
-    package = inst.package;
+    package = gatewayPackage;
   };
 
   instanceConfigs = lib.mapAttrsToList mkInstanceConfig enabledInstances;
@@ -339,6 +671,30 @@ in {
       description = "Workspace directory for Clawdis agent skills.";
     };
 
+    documents = lib.mkOption {
+      type = lib.types.nullOr lib.types.path;
+      default = null;
+      description = "Path to a documents directory containing AGENTS.md, SOUL.md, and TOOLS.md.";
+    };
+
+    plugins = lib.mkOption {
+      type = lib.types.listOf (lib.types.submodule {
+        options = {
+          source = lib.mkOption {
+            type = lib.types.str;
+            description = "Plugin source pointer (e.g., github:owner/repo or path:/...).";
+          };
+          config = lib.mkOption {
+            type = lib.types.attrs;
+            default = {};
+            description = "Plugin-specific configuration (env/files/etc).";
+          };
+        };
+      });
+      default = [];
+      description = "Plugins enabled for the default instance.";
+    };
+
     providers.telegram = {
       enable = lib.mkOption {
         type = lib.types.bool;
@@ -358,11 +714,7 @@ in {
         description = "Allowed Telegram chat IDs.";
       };
 
-      requireMention = lib.mkOption {
-        type = lib.types.bool;
-        default = false;
-        description = "Require @mention in Telegram groups.";
-      };
+      
     };
 
     providers.anthropic = {
@@ -391,11 +743,6 @@ in {
       };
     };
 
-    routing.groupChat.requireMention = lib.mkOption {
-      type = lib.types.bool;
-      default = false;
-      description = "Require mention for group chat activation.";
-    };
 
     launchd.enable = lib.mkOption {
       type = lib.types.bool;
@@ -416,7 +763,7 @@ in {
         assertion = lib.length (lib.attrNames appDefaultsEnabled) <= 1;
         message = "Only one Clawdis instance may enable appDefaults.";
       }
-    ];
+    ] ++ documentsAssertions ++ pluginAssertions ++ pluginSkillAssertions;
 
     home.packages = lib.unique (map (item: item.package) instanceConfigs);
 
@@ -429,10 +776,26 @@ in {
           force = true;
         };
       })
-      // (lib.listToAttrs appInstalls);
+      // (lib.listToAttrs appInstalls)
+      // documentsFiles
+      // pluginSkillsFiles
+      // pluginConfigFiles;
+
+    home.activation.clawdisDocumentGuard = lib.mkIf documentsEnabled (
+      lib.hm.dag.entryBefore [ "writeBoundary" ] ''
+        set -euo pipefail
+        ${documentsGuard}
+      ''
+    );
 
     home.activation.clawdisDirs = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       /bin/mkdir -p ${lib.concatStringsSep " " (lib.concatMap (item: item.dirs) instanceConfigs)}
+      /bin/mkdir -p ${lib.concatStringsSep " " (lib.flatten (map pluginStateDirsFor (lib.attrNames enabledInstances)))}
+    '';
+
+    home.activation.clawdisPluginGuard = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+      set -euo pipefail
+      ${pluginGuards}
     '';
 
     home.activation.clawdisAppDefaults = lib.mkIf (pkgs.stdenv.hostPlatform.isDarwin && appDefaults != {}) (

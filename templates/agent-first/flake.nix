@@ -27,17 +27,30 @@
             programs.home-manager.enable = true;
 
             programs.clawdis = {
-              enable = true;
-              providers.telegram = {
+              # REPLACE: path to your managed documents directory
+              documents = ./documents;
+              instances.default = {
                 enable = true;
-                # REPLACE: path to your bot token file
-                botTokenFile = "<tokenPath>";
-                # REPLACE: your Telegram user ID (get from @userinfobot)
-                allowFrom = [ <allowFrom> ];
-              };
-              providers.anthropic = {
-                # REPLACE: path to your Anthropic API key file
-                apiKeyFile = "<anthropicKeyPath>";
+                providers.telegram = {
+                  enable = true;
+                  # REPLACE: path to your bot token file
+                  botTokenFile = "<tokenPath>";
+                  # REPLACE: your Telegram user ID (get from @userinfobot)
+                  allowFrom = [ <allowFrom> ];
+                  # Group defaults (required in Nix mode):
+                  groups = {
+                    "*" = { requireMention = true; };
+                  };
+                };
+                providers.anthropic = {
+                  # REPLACE: path to your Anthropic API key file
+                  apiKeyFile = "<anthropicKeyPath>";
+                };
+
+                plugins = [
+                  # Example plugin without config:
+                  { source = "github:acme/hello-world"; }
+                ];
               };
             };
           }

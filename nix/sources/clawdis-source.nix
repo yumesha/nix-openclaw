@@ -2,6 +2,6 @@
 {
   owner = "steipete";
   repo = "clawdis";
-  rev = "e5cae2a2e4676111d7bbf1cd1d9956e78ca9088a";
-  hash = "sha256-wmuaYtJM5WF5/HnU3+f6Z6qMMLj+ph31ha431WtYvr4=";
+  rev = "v2.0.0-beta5";
+  hash = "sha256-ZtlknzdrETVi84XKXgmPPwnb3CC+rXWAxZm2aOwDFAI=";
 }
