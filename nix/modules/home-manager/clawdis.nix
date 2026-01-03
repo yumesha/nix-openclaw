@@ -584,13 +584,19 @@ let
         enable = true;
         config = {
           Label = inst.launchd.label;
-          ProgramArguments = [ "${gatewayWrapper}/bin/clawdis-gateway-${name}" ];
+          ProgramArguments = [
+            "${gatewayWrapper}/bin/clawdis-gateway-${name}"
+            "gateway"
+            "--port"
+            "${toString inst.gatewayPort}"
+          ];
           RunAtLoad = true;
           KeepAlive = true;
           WorkingDirectory = inst.stateDir;
           StandardOutPath = inst.logPath;
           StandardErrorPath = inst.logPath;
           EnvironmentVariables = {
+            HOME = homeDir;
             CLAWDIS_CONFIG_PATH = inst.configPath;
             CLAWDIS_STATE_DIR = inst.stateDir;
             CLAWDIS_IMAGE_BACKEND = "sips";
@@ -625,6 +631,7 @@ let
   appDefaults = lib.foldl' (acc: item: lib.recursiveUpdate acc item.appDefaults) {} instanceConfigs;
 
   appDefaultsEnabled = lib.filterAttrs (_: inst: inst.appDefaults.enable) enabledInstances;
+  pluginStateDirsAll = lib.flatten (map pluginStateDirsFor (lib.attrNames enabledInstances));
 
   assertions = lib.flatten (lib.mapAttrsToList (name: inst: [
     {
@@ -790,7 +797,7 @@ in {
 
     home.activation.clawdisDirs = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       /bin/mkdir -p ${lib.concatStringsSep " " (lib.concatMap (item: item.dirs) instanceConfigs)}
-      /bin/mkdir -p ${lib.concatStringsSep " " (lib.flatten (map pluginStateDirsFor (lib.attrNames enabledInstances)))}
+      ${lib.optionalString (pluginStateDirsAll != []) "/bin/mkdir -p ${lib.concatStringsSep " " pluginStateDirsAll}"}
     '';
 
     home.activation.clawdisPluginGuard = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
