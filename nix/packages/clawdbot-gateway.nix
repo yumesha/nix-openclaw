@@ -32,6 +32,8 @@ stdenv.mkDerivation (finalAttrs: {
       then pnpmDepsHash
       else "sha256-TITqhJhk5cHqCDmeX+KJ1hqt9dEbvJu6vi8xhteYfC4=";
     fetcherVersion = 2;
+    npm_config_arch = pnpmArch;
+    npm_config_platform = pnpmPlatform;
   };
 
   nativeBuildInputs = [
