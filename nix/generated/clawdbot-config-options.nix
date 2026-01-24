@@ -1431,6 +1431,16 @@ in
           requireMention = lib.mkOption {
             type = t.bool;
           };
+          tools = lib.mkOption {
+            type = t.submodule { options = {
+            allow = lib.mkOption {
+              type = t.listOf (t.str);
+            };
+            deny = lib.mkOption {
+              type = t.listOf (t.str);
+            };
+          }; };
+          };
         }; });
         };
         historyLimit = lib.mkOption {
@@ -1554,6 +1564,16 @@ in
         type = t.attrsOf (t.submodule { options = {
         requireMention = lib.mkOption {
           type = t.bool;
+        };
+        tools = lib.mkOption {
+          type = t.submodule { options = {
+          allow = lib.mkOption {
+            type = t.listOf (t.str);
+          };
+          deny = lib.mkOption {
+            type = t.listOf (t.str);
+          };
+        }; };
         };
       }; });
       };
@@ -1751,6 +1771,16 @@ in
             systemPrompt = lib.mkOption {
               type = t.str;
             };
+            tools = lib.mkOption {
+              type = t.submodule { options = {
+              allow = lib.mkOption {
+                type = t.listOf (t.str);
+              };
+              deny = lib.mkOption {
+                type = t.listOf (t.str);
+              };
+            }; };
+            };
             users = lib.mkOption {
               type = t.listOf (t.oneOf [ t.str t.number ]);
             };
@@ -1764,6 +1794,16 @@ in
           };
           slug = lib.mkOption {
             type = t.str;
+          };
+          tools = lib.mkOption {
+            type = t.submodule { options = {
+            allow = lib.mkOption {
+              type = t.listOf (t.str);
+            };
+            deny = lib.mkOption {
+              type = t.listOf (t.str);
+            };
+          }; };
           };
           users = lib.mkOption {
             type = t.listOf (t.oneOf [ t.str t.number ]);
@@ -1966,6 +2006,16 @@ in
           systemPrompt = lib.mkOption {
             type = t.str;
           };
+          tools = lib.mkOption {
+            type = t.submodule { options = {
+            allow = lib.mkOption {
+              type = t.listOf (t.str);
+            };
+            deny = lib.mkOption {
+              type = t.listOf (t.str);
+            };
+          }; };
+          };
           users = lib.mkOption {
             type = t.listOf (t.oneOf [ t.str t.number ]);
           };
@@ -1979,6 +2029,16 @@ in
         };
         slug = lib.mkOption {
           type = t.str;
+        };
+        tools = lib.mkOption {
+          type = t.submodule { options = {
+          allow = lib.mkOption {
+            type = t.listOf (t.str);
+          };
+          deny = lib.mkOption {
+            type = t.listOf (t.str);
+          };
+        }; };
         };
         users = lib.mkOption {
           type = t.listOf (t.oneOf [ t.str t.number ]);
@@ -2093,6 +2153,16 @@ in
           requireMention = lib.mkOption {
             type = t.bool;
           };
+          tools = lib.mkOption {
+            type = t.submodule { options = {
+            allow = lib.mkOption {
+              type = t.listOf (t.str);
+            };
+            deny = lib.mkOption {
+              type = t.listOf (t.str);
+            };
+          }; };
+          };
         }; });
         };
         historyLimit = lib.mkOption {
@@ -2185,6 +2255,16 @@ in
         type = t.attrsOf (t.submodule { options = {
         requireMention = lib.mkOption {
           type = t.bool;
+        };
+        tools = lib.mkOption {
+          type = t.submodule { options = {
+          allow = lib.mkOption {
+            type = t.listOf (t.str);
+          };
+          deny = lib.mkOption {
+            type = t.listOf (t.str);
+          };
+        }; };
         };
       }; });
       };
@@ -2308,6 +2388,16 @@ in
           requireMention = lib.mkOption {
             type = t.bool;
           };
+          tools = lib.mkOption {
+            type = t.submodule { options = {
+            allow = lib.mkOption {
+              type = t.listOf (t.str);
+            };
+            deny = lib.mkOption {
+              type = t.listOf (t.str);
+            };
+          }; };
+          };
         }; });
         };
         replyStyle = lib.mkOption {
@@ -2315,6 +2405,16 @@ in
         };
         requireMention = lib.mkOption {
           type = t.bool;
+        };
+        tools = lib.mkOption {
+          type = t.submodule { options = {
+          allow = lib.mkOption {
+            type = t.listOf (t.str);
+          };
+          deny = lib.mkOption {
+            type = t.listOf (t.str);
+          };
+        }; };
         };
       }; });
       };
@@ -2628,6 +2728,16 @@ in
           systemPrompt = lib.mkOption {
             type = t.str;
           };
+          tools = lib.mkOption {
+            type = t.submodule { options = {
+            allow = lib.mkOption {
+              type = t.listOf (t.str);
+            };
+            deny = lib.mkOption {
+              type = t.listOf (t.str);
+            };
+          }; };
+          };
           users = lib.mkOption {
             type = t.listOf (t.oneOf [ t.str t.number ]);
           };
@@ -2846,6 +2956,16 @@ in
         };
         systemPrompt = lib.mkOption {
           type = t.str;
+        };
+        tools = lib.mkOption {
+          type = t.submodule { options = {
+          allow = lib.mkOption {
+            type = t.listOf (t.str);
+          };
+          deny = lib.mkOption {
+            type = t.listOf (t.str);
+          };
+        }; };
         };
         users = lib.mkOption {
           type = t.listOf (t.oneOf [ t.str t.number ]);
@@ -3111,6 +3231,16 @@ in
           systemPrompt = lib.mkOption {
             type = t.str;
           };
+          tools = lib.mkOption {
+            type = t.submodule { options = {
+            allow = lib.mkOption {
+              type = t.listOf (t.str);
+            };
+            deny = lib.mkOption {
+              type = t.listOf (t.str);
+            };
+          }; };
+          };
           topics = lib.mkOption {
             type = t.attrsOf (t.submodule { options = {
             allowFrom = lib.mkOption {
@@ -3316,6 +3446,16 @@ in
         systemPrompt = lib.mkOption {
           type = t.str;
         };
+        tools = lib.mkOption {
+          type = t.submodule { options = {
+          allow = lib.mkOption {
+            type = t.listOf (t.str);
+          };
+          deny = lib.mkOption {
+            type = t.listOf (t.str);
+          };
+        }; };
+        };
         topics = lib.mkOption {
           type = t.attrsOf (t.submodule { options = {
           allowFrom = lib.mkOption {
@@ -3479,6 +3619,16 @@ in
           requireMention = lib.mkOption {
             type = t.bool;
           };
+          tools = lib.mkOption {
+            type = t.submodule { options = {
+            allow = lib.mkOption {
+              type = t.listOf (t.str);
+            };
+            deny = lib.mkOption {
+              type = t.listOf (t.str);
+            };
+          }; };
+          };
         }; });
         };
         historyLimit = lib.mkOption {
@@ -3588,6 +3738,16 @@ in
         type = t.attrsOf (t.submodule { options = {
         requireMention = lib.mkOption {
           type = t.bool;
+        };
+        tools = lib.mkOption {
+          type = t.submodule { options = {
+          allow = lib.mkOption {
+            type = t.listOf (t.str);
+          };
+          deny = lib.mkOption {
+            type = t.listOf (t.str);
+          };
+        }; };
         };
       }; });
       };
