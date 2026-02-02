@@ -25,22 +25,22 @@ try:
     machine.wait_for_open_port(18999)
 except Exception:
     machine.succeed(
-        f"su - alice -c '{user_env} systemctl --user status openclaw-gateway.service --no-pager -n 200 2>&1' || true"
+        f"su - alice -c '{user_env} systemctl --user status openclaw-gateway.service --no-pager -n 200 1>&2' || true"
     )
     machine.succeed(
-        f"su - alice -c '{user_env} systemctl --user show openclaw-gateway.service -p ActiveState -p SubState -p ExecMainCode -p ExecMainStatus -p MainPID --no-pager 2>&1' || true"
+        f"su - alice -c '{user_env} systemctl --user show openclaw-gateway.service -p ActiveState -p SubState -p ExecMainCode -p ExecMainStatus -p MainPID --no-pager 1>&2' || true"
     )
     machine.succeed(
-        "journalctl --user -u openclaw-gateway.service --no-pager -n 200 2>&1 || true"
+        "journalctl --user -u openclaw-gateway.service --no-pager -n 200 1>&2 || true"
     )
-    machine.succeed("ls -la /tmp/openclaw/openclaw-gateway.log || true")
-    machine.succeed("tail -n 200 /tmp/openclaw/openclaw-gateway.log || true")
-    machine.succeed("tail -n 200 /tmp/openclaw/openclaw.log || true")
-    machine.succeed("ls -la /tmp/openclaw || true")
-    machine.succeed("ps -eo pid,ppid,cmd | grep -E '[o]penclaw|[n]ode' || true")
-    machine.succeed("ls -la /tmp/openclaw/node-report* || true")
-    machine.succeed("tail -n 200 /tmp/openclaw/node-report* || true")
-    machine.succeed("coredumpctl info --no-pager | tail -n 200 || true")
+    machine.succeed("ls -la /tmp/openclaw/openclaw-gateway.log 1>&2 || true")
+    machine.succeed("tail -n 200 /tmp/openclaw/openclaw-gateway.log 1>&2 || true")
+    machine.succeed("tail -n 200 /tmp/openclaw/openclaw.log 1>&2 || true")
+    machine.succeed("ls -la /tmp/openclaw 1>&2 || true")
+    machine.succeed("ps -eo pid,ppid,cmd | grep -E '[o]penclaw|[n]ode' 1>&2 || true")
+    machine.succeed("ls -la /tmp/openclaw/node-report* 1>&2 || true")
+    machine.succeed("tail -n 200 /tmp/openclaw/node-report* 1>&2 || true")
+    machine.succeed("coredumpctl info --no-pager | tail -n 200 >&2 || true")
     machine.succeed(
         f"su - alice -c '{user_env} systemctl --user show openclaw-gateway.service --no-pager -p Environment 2>&1 > /tmp/openclaw/systemctl-env.txt' || true"
     )
