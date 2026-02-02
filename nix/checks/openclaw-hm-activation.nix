@@ -50,6 +50,9 @@ pkgs.testers.nixosTest {
                       token = "hm-activation-test-token";
                     };
                   };
+                  plugins = {
+                    enabled = false;
+                  };
                 };
               };
             };
