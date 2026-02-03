@@ -48,6 +48,9 @@
 
         checks = {
           gateway = packageSetStable.openclaw-gateway;
+          package-contents = pkgs.callPackage ./nix/checks/openclaw-package-contents.nix {
+            openclawGateway = packageSetStable.openclaw-gateway;
+          };
         } // (if pkgs.stdenv.hostPlatform.isLinux then {
           gateway-tests = pkgs.callPackage ./nix/checks/openclaw-gateway-tests.nix {
             sourceInfo = sourceInfoStable;
