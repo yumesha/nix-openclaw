@@ -102,7 +102,7 @@ stdenv.mkDerivation {
 
   env = {
     OPENCLAW_CONFIG_PATH = configFile;
-    OPENCLAW_SRC = openclawGateway.src;
+    OPENCLAW_SRC = "${openclawGateway}/lib/openclaw";
   };
 
   doCheck = true;
