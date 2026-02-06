@@ -1,8 +1,9 @@
 # Pinned OpenClaw source for nix-openclaw
+# Using yumesha fork with effort parameter support
 {
-  owner = "openclaw";
+  owner = "yumesha";
   repo = "openclaw";
-  rev = "a50638eead1b86ac633d2bf70f7b59bc5cd3b63e";
-  hash = "sha256-mo2mdWm/D0EYRsp6VoWMqPzimBwd3eRuPqI+wef4fDw=";
-  pnpmDepsHash = "sha256-kKpMcAPgX+z3yaa5jY4rpVoAa1oOOOpiMMDJc49zuyI=";
+  rev = "e3e3e9f51e2f2759f6fab3471f9cee4cc50e437c";
+  hash = "";  # Run nix build to get correct hash
+  pnpmDepsHash = "";  # Run nix build to get correct hash
 }
