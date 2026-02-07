@@ -59,23 +59,25 @@ let
   # file and injects the token into the config at build time.
   stripTokenFiles = config:
     let
+      channels = config.channels or {};
       stripAccount = acc: builtins.removeAttrs acc [ "tokenFile" ];
       stripDiscord = dc:
         let base = builtins.removeAttrs dc [ "tokenFile" ];
-        in if base ? accounts
+        in if base ? accounts && base.accounts != null
            then base // { accounts = builtins.mapAttrs (_: stripAccount) base.accounts; }
            else base;
     in
-      if config ? channels && config.channels ? discord
-      then config // { channels = config.channels // { discord = stripDiscord config.channels.discord; }; }
+      if channels ? discord && channels.discord != null
+      then config // { channels = channels // { discord = stripDiscord channels.discord; }; }
       else config;
 
   # Extract Discord tokenFile paths from merged config for activation script.
   extractDiscordTokenFiles = config:
     let
-      discord = config.channels.discord or {};
+      channels = config.channels or {};
+      discord = channels.discord or {};
       topLevel = discord.tokenFile or null;
-      accounts = lib.optionalAttrs (discord ? accounts)
+      accounts = lib.optionalAttrs (discord ? accounts && discord.accounts != null)
         (lib.filterAttrs (_: v: v != null)
           (builtins.mapAttrs (_: acc: acc.tokenFile or null) discord.accounts));
     in {
@@ -290,6 +292,7 @@ in {
     # The config symlink is replaced with a writable copy so the gateway
     # can still update it at runtime (e.g. for config set commands).
     home.activation.openclawTokenFiles = let
+      esc = lib.escapeShellArg;
       tokenFileScripts = lib.concatStringsSep "\n" (map (item:
         let
           dtf = item.discordTokenFiles;
@@ -302,27 +305,27 @@ in {
           readlink = lib.getExe' pkgs.coreutils "readlink";
 
           topLevelScript = lib.optionalString (dtf.topLevel != null) ''
-            if [ -f "${dtf.topLevel}" ]; then
-              _token="$(${cat} "${dtf.topLevel}")"
-              ${jq} --arg token "$_token" '.channels.discord.token = $token' "${item.configPath}" > "${item.configPath}.tmp"
-              ${mv} "${item.configPath}.tmp" "${item.configPath}"
+            if [ -f ${esc dtf.topLevel} ]; then
+              _token="$(${cat} ${esc dtf.topLevel})"
+              ( umask 077; ${jq} --arg token "$_token" '.channels.discord.token = $token' ${esc item.configPath} > ${esc "${item.configPath}.tmp"} )
+              ${mv} ${esc "${item.configPath}.tmp"} ${esc item.configPath}
             fi
           '';
 
           accountScripts = lib.concatStringsSep "\n" (lib.mapAttrsToList (accName: tokenFile: ''
-            if [ -f "${tokenFile}" ]; then
-              _token="$(${cat} "${tokenFile}")"
-              ${jq} --arg token "$_token" --arg acc "${accName}" '.channels.discord.accounts[$acc].token = $token' "${item.configPath}" > "${item.configPath}.tmp"
-              ${mv} "${item.configPath}.tmp" "${item.configPath}"
+            if [ -f ${esc tokenFile} ]; then
+              _token="$(${cat} ${esc tokenFile})"
+              ( umask 077; ${jq} --arg token "$_token" --arg acc ${esc accName} '.channels.discord.accounts[$acc].token = $token' ${esc item.configPath} > ${esc "${item.configPath}.tmp"} )
+              ${mv} ${esc "${item.configPath}.tmp"} ${esc item.configPath}
             fi
           '') dtf.accounts);
         in lib.optionalString dtf.hasAny ''
           # Make config writable (replace symlink with copy)
-          if [ -L "${item.configPath}" ]; then
-            _real="$(${readlink} -f "${item.configPath}")"
-            ${rm} "${item.configPath}"
-            ${cp} "$_real" "${item.configPath}"
-            ${chmod} 600 "${item.configPath}"
+          if [ -L ${esc item.configPath} ]; then
+            _real="$(${readlink} -f ${esc item.configPath})"
+            ${rm} ${esc item.configPath}
+            ${cp} "$_real" ${esc item.configPath}
+            ${chmod} 600 ${esc item.configPath}
           fi
           ${topLevelScript}
           ${accountScripts}
