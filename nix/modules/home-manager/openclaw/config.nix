@@ -53,6 +53,36 @@ let
     else
       value;
 
+  # Strip tokenFile from Discord config before serialization.
+  # The OpenClaw runtime doesn't understand tokenFile for Discord;
+  # nix-openclaw handles it via an activation script that reads the
+  # file and injects the token into the config at build time.
+  stripTokenFiles = config:
+    let
+      stripAccount = acc: builtins.removeAttrs acc [ "tokenFile" ];
+      stripDiscord = dc:
+        let base = builtins.removeAttrs dc [ "tokenFile" ];
+        in if base ? accounts
+           then base // { accounts = builtins.mapAttrs (_: stripAccount) base.accounts; }
+           else base;
+    in
+      if config ? channels && config.channels ? discord
+      then config // { channels = config.channels // { discord = stripDiscord config.channels.discord; }; }
+      else config;
+
+  # Extract Discord tokenFile paths from merged config for activation script.
+  extractDiscordTokenFiles = config:
+    let
+      discord = config.channels.discord or {};
+      topLevel = discord.tokenFile or null;
+      accounts = lib.optionalAttrs (discord ? accounts)
+        (lib.filterAttrs (_: v: v != null)
+          (builtins.mapAttrs (_: acc: acc.tokenFile or null) discord.accounts));
+    in {
+      inherit topLevel accounts;
+      hasAny = topLevel != null || accounts != {};
+    };
+
   baseConfig = {
     gateway = {
       mode = "local";
@@ -74,7 +104,9 @@ let
     pluginPackages = plugins.pluginPackagesFor name;
     pluginEnvAll = plugins.pluginEnvAllFor name;
     mergedConfig = stripNulls (lib.recursiveUpdate (lib.recursiveUpdate baseConfig cfg.config) inst.config);
-    configJson = builtins.toJSON mergedConfig;
+    discordTokenFiles = extractDiscordTokenFiles mergedConfig;
+    cleanedConfig = stripTokenFiles mergedConfig;
+    configJson = builtins.toJSON cleanedConfig;
     configFile = pkgs.writeText "openclaw-${name}.json" configJson;
     gatewayWrapper = pkgs.writeShellScriptBin "openclaw-gateway-${name}" ''
       set -euo pipefail
@@ -129,6 +161,7 @@ let
     };
     configFile = configFile;
     configPath = inst.configPath;
+    inherit discordTokenFiles;
 
     dirs = [ inst.stateDir inst.workspaceDir (builtins.dirOf inst.logPath) ];
 
@@ -242,6 +275,59 @@ in {
     home.activation.openclawConfigFiles = lib.hm.dag.entryAfter [ "openclawDirs" ] ''
       ${lib.concatStringsSep "\n" (map (item: "run --quiet ${lib.getExe' pkgs.coreutils "ln"} -sfn ${item.configFile} ${item.configPath}") instanceConfigs)}
     '';
+
+    # Inject Discord bot tokens from tokenFile paths into config.
+    # The OpenClaw runtime supports tokenFile for Telegram but not Discord.
+    # This activation script bridges the gap: it reads the token from a file
+    # (e.g. a sops-decrypted secret) and injects it into the config JSON.
+    # The config symlink is replaced with a writable copy so the gateway
+    # can still update it at runtime (e.g. for config set commands).
+    home.activation.openclawTokenFiles = let
+      tokenFileScripts = lib.concatStringsSep "\n" (map (item:
+        let
+          dtf = item.discordTokenFiles;
+          jq = lib.getExe pkgs.jq;
+          cat = lib.getExe' pkgs.coreutils "cat";
+          cp = lib.getExe' pkgs.coreutils "cp";
+          mv = lib.getExe' pkgs.coreutils "mv";
+          chmod = lib.getExe' pkgs.coreutils "chmod";
+          rm = lib.getExe' pkgs.coreutils "rm";
+          readlink = lib.getExe' pkgs.coreutils "readlink";
+
+          topLevelScript = lib.optionalString (dtf.topLevel != null) ''
+            if [ -f "${dtf.topLevel}" ]; then
+              _token="$(${cat} "${dtf.topLevel}")"
+              ${jq} --arg token "$_token" '.channels.discord.token = $token' "${item.configPath}" > "${item.configPath}.tmp"
+              ${mv} "${item.configPath}.tmp" "${item.configPath}"
+            fi
+          '';
+
+          accountScripts = lib.concatStringsSep "\n" (lib.mapAttrsToList (accName: tokenFile: ''
+            if [ -f "${tokenFile}" ]; then
+              _token="$(${cat} "${tokenFile}")"
+              ${jq} --arg token "$_token" --arg acc "${accName}" '.channels.discord.accounts[$acc].token = $token' "${item.configPath}" > "${item.configPath}.tmp"
+              ${mv} "${item.configPath}.tmp" "${item.configPath}"
+            fi
+          '') dtf.accounts);
+        in lib.optionalString dtf.hasAny ''
+          # Make config writable (replace symlink with copy)
+          if [ -L "${item.configPath}" ]; then
+            _real="$(${readlink} -f "${item.configPath}")"
+            ${rm} "${item.configPath}"
+            ${cp} "$_real" "${item.configPath}"
+            ${chmod} 600 "${item.configPath}"
+          fi
+          ${topLevelScript}
+          ${accountScripts}
+        ''
+      ) instanceConfigs);
+      hasAnyTokenFiles = lib.any (item: item.discordTokenFiles.hasAny) instanceConfigs;
+    in lib.mkIf hasAnyTokenFiles (
+      lib.hm.dag.entryAfter [ "openclawConfigFiles" ] ''
+        set -euo pipefail
+        ${tokenFileScripts}
+      ''
+    );
 
     home.activation.openclawPluginGuard = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       set -euo pipefail

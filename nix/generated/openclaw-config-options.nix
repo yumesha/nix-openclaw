@@ -2716,6 +2716,11 @@ in
           type = t.nullOr (t.str);
           default = null;
         };
+        tokenFile = lib.mkOption {
+          type = t.nullOr (t.str);
+          default = null;
+          description = "Path to file containing Discord bot token (alternative to token). Nix-openclaw reads the file at activation time and injects the token into the config.";
+        };
       }; }));
         default = null;
       };
@@ -3147,6 +3152,11 @@ in
       token = lib.mkOption {
         type = t.nullOr (t.str);
         default = null;
+      };
+      tokenFile = lib.mkOption {
+        type = t.nullOr (t.str);
+        default = null;
+        description = "Path to file containing Discord bot token (alternative to token). Nix-openclaw reads the file at activation time and injects the token into the config.";
       };
     }; });
       default = null;
