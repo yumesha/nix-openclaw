@@ -4,6 +4,6 @@
   owner = "yumesha";
   repo = "openclaw";
   rev = "e3e3e9f51e2f2759f6fab3471f9cee4cc50e437c"; # v2026.2-13-custom
-  hash = ""; # Run nix build to get correct hash
+  hash = "sha256-6FFF9vVFnLEY4AOlEwPy1sYYvTcRPWiPAc094tgQK84=";
   pnpmDepsHash = ""; # Run nix build to get correct hash
 }
