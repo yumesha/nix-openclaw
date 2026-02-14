@@ -39,7 +39,7 @@ in
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "openclaw-gateway";
-  version = "2026.1.8-2";
+  version = "2026.2.13";
 
   src = if gatewaySrc != null then gatewaySrc else fetchFromGitHub sourceFetch;
 
