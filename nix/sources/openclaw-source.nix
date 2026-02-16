@@ -3,7 +3,7 @@
 {
   owner = "yumesha";
   repo = "openclaw";
-  rev = "4785bde62f1233b37883b74d1d3034b86e8fd1e4"; # Moonshot video provider
-  hash = "sha256-d2wxwfoHbZdpNDh9vSDgwTGkYekv9gIJ/khScjm3opY=";
-  pnpmDepsHash = "sha256-xuIfX8WgLegA1FCvuLybNtxodfpeoDo3lUYH6PlaNp0=";
+  rev = "4e80ba990655a7be4b6ccdfc90d31f4aac55d5fe"; # Moonshot native video understanding
+  hash = "sha256-kqU+rFcZsk8F2FueMhRDnYxijc24krR9mcOwE1oJOV8=";
+  pnpmDepsHash = "sha256-g2O2p5x5KkgqTbROwRe0BoDE2GMkm0kJs5aqck5cUhw=";
 }
