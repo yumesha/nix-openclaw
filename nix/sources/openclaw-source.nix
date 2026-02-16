@@ -3,7 +3,7 @@
 {
   owner = "yumesha";
   repo = "openclaw";
-  rev = "4a8becc40fe4baed1b28fccd13b0271f59755fcc"; # OAuth refresh fix
-  hash = "sha256-0fuaTQE/1Z+yYKlpFXWIWkw+JACREZGaah9Y8Igmop4=";
+  rev = "f4cc47c59aad695cda53a10d6ed3fa15e259ed8d"; # Moonshot video provider
+  hash = "sha256-7TiBMIyiuvBH/mZ7AneSoaH+bxireUBwGMOE50KZ8DM=";
   pnpmDepsHash = "sha256-xuIfX8WgLegA1FCvuLybNtxodfpeoDo3lUYH6PlaNp0=";
 }
