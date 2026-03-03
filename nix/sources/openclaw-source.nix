@@ -1,8 +1,9 @@
 # Pinned OpenClaw source for nix-openclaw
+# Using yumesha fork with handleSessionCommand fix
 {
-  owner = "openclaw";
+  owner = "yumesha";
   repo = "openclaw";
-  rev = "1d7a287cf6e52b23bc8365d17e8190a587086374";
-  hash = "sha256-qM5EKvWvzLz+Q3Qlh4emRct4dhiIcdXH+aTGYa7h3g8=";
-  pnpmDepsHash = "sha256-QnKPVUPgy3znCQRmfqiIPtRLgZ0SPwWqUsJ4USF2LJE=";
+  rev = "v2026.3.3";
+  hash = "";
+  pnpmDepsHash = "";
 }
