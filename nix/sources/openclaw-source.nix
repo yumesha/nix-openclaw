@@ -3,7 +3,7 @@
 {
   owner = "yumesha";
   repo = "openclaw";
-  rev = "79af5d5105f1a6d0a02c2b978322fab0396621b5";
-  hash = "sha256-9ogCI8dns4BLiCTAD5htGV/j2nW//ao2aIXGBJ/t3n4=";
+  rev = "0536e73fad5f07aef2e6b6f5126dbfaf06772b2a";
+  hash = "sha256-2wUllNRU5lJPpy15NwdJkE7KOZJTzFQ0hlzGZj9t8xw=";
   pnpmDepsHash = "sha256-QnKPVUPgy3znCQRmfqiIPtRLgZ0SPwWqUsJ4USF2LJE=";
 }
