@@ -16,7 +16,7 @@ buildEnv {
 
   meta = with lib; {
     description = "OpenClaw batteries-included bundle (gateway + app + tools)";
-    homepage = "https://github.com/openclaw/openclaw";
+    homepage = "https://github.com/yumesha/openclaw-v2026.2.16";
     license = licenses.mit;
     platforms = platforms.darwin ++ platforms.linux;
   };

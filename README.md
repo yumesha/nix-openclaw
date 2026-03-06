@@ -794,7 +794,7 @@ Namespaces are one honking great idea -- let's do more of those!
 
 ## Upstream
 
-Wraps [OpenClaw](https://github.com/openclaw/openclaw) by Peter Steinberger.
+Wraps [OpenClaw](https://github.com/yumesha/openclaw-v2026.2.16) by Peter Steinberger.
 
 ## License
 

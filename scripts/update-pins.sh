@@ -17,7 +17,7 @@ log() {
 upstream_checks_green() {
   local sha="$1"
   local checks_json
-  checks_json=$(gh api "/repos/openclaw/openclaw/commits/${sha}/check-runs?per_page=100" 2>/dev/null || true)
+  checks_json=$(gh api "/repos/yumesha/openclaw-v2026.2.16/commits/${sha}/check-runs?per_page=100" 2>/dev/null || true)
   if [[ -z "$checks_json" ]]; then
     log "No check runs found for $sha"
     return 1
@@ -54,9 +54,9 @@ log "Updating nix-steipete-tools input"
 nix flake update --update-input nix-steipete-tools --accept-flake-config
 
 log "Resolving openclaw main SHAs"
-mapfile -t candidate_shas < <(gh api /repos/openclaw/openclaw/commits?per_page=10 | jq -r '.[].sha' || true)
+mapfile -t candidate_shas < <(gh api /repos/yumesha/openclaw-v2026.2.16/commits?per_page=10 | jq -r '.[].sha' || true)
 if [[ ${#candidate_shas[@]} -eq 0 ]]; then
-  latest_sha=$(git ls-remote https://github.com/openclaw/openclaw.git refs/heads/main | awk '{print $1}' || true)
+  latest_sha=$(git ls-remote https://github.com/yumesha/openclaw-v2026.2.16.git refs/heads/main | awk '{print $1}' || true)
   if [[ -z "$latest_sha" ]]; then
     echo "Failed to resolve openclaw main SHA" >&2
     exit 1
@@ -74,7 +74,7 @@ for sha in "${candidate_shas[@]}"; do
     continue
   fi
   log "Testing upstream SHA: $sha"
-  source_url="https://github.com/openclaw/openclaw/archive/${sha}.tar.gz"
+  source_url="https://github.com/yumesha/openclaw-v2026.2.16/archive/${sha}.tar.gz"
   log "Prefetching source tarball"
   source_prefetch=$(
     nix --extra-experimental-features "nix-command flakes" store prefetch-file --unpack --json "$source_url" 2>"/tmp/nix-prefetch-source.err" \
@@ -138,7 +138,7 @@ fi
 log "Selected upstream SHA: $selected_sha"
 
 log "Fetching latest release metadata"
-release_json=$(gh api /repos/openclaw/openclaw/releases?per_page=20 || true)
+release_json=$(gh api /repos/yumesha/openclaw-v2026.2.16/releases?per_page=20 || true)
 if [[ -z "$release_json" ]]; then
   echo "Failed to fetch release metadata" >&2
   exit 1

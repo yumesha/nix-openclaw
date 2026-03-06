@@ -2,7 +2,7 @@
 # Using yumesha fork with OAuth auto-refresh + OPENCLAW_SKIP_CLAUDE_CLI_SYNC
 {
   owner = "yumesha";
-  repo = "openclaw";
+  repo = "openclaw-v2026.2.16";
   # Release v2026.2.16: /startbot /stopbot commands + anti-scanner security
   rev = "v2026.2.16";
   hash = "sha256-eyetgkegCVn1HL74goRiUTIjpksNnMKj65Yx1V8D3/0=";

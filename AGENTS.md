@@ -59,7 +59,7 @@ Golden path for pins (yolo + manual bumps):
   - Regenerates `nix/generated/openclaw-config-options.nix` from upstream schema
   - Updates app pin/hash, commits, rebases, pushes to `main`
 - Manual bump (rare): `GH_TOKEN=... scripts/update-pins.sh` (same steps as above). Use only if yolo is blocked.
-- To verify freshness: `git pull --ff-only` and check `nix/sources/openclaw-source.nix` vs `git ls-remote https://github.com/openclaw/openclaw.git refs/heads/main`.
+- To verify freshness: `git pull --ff-only` and check `nix/sources/openclaw-source.nix` vs `git ls-remote https://github.com/yumesha/openclaw-v2026.2.16.git refs/heads/main`.
 - If upstream is moving fast and tighter freshness is needed, trigger yolo manually: `gh workflow run "Yolo Update Pins"`.
 
 CI polling (hard rule):
