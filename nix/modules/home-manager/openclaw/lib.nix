@@ -22,7 +22,10 @@ let
     stepieteRev = "983210e3b6e9285780e87f48ce9354b51a270e95";
     stepieteNarHash = "sha256-fY8t41kMSHu2ovf89mIdvC7vkceroCwKxw/MKVn4rsE=";
     stepiete = tool:
-      "github:openclaw/nix-steipete-tools?dir=tools/${tool}&rev=${stepieteRev}&narHash=${stepieteNarHash}";
+      "github:yumesha/nix-steipete-tools?dir=tools/${tool}&rev=${stepieteRev}&narHash=${stepieteNarHash}";
+    # Bird is now a separate private repository - requires SSH access
+    # Release: https://github.com/yumesha/bird-x-twitter-cmdline/releases/tag/v0.9.1
+    birdTag = "v0.9.1";
   in {
     summarize = stepiete "summarize";
     peekaboo = stepiete "peekaboo";
@@ -32,7 +35,8 @@ let
     camsnap = stepiete "camsnap";
     gogcli = stepiete "gogcli";
     goplaces = stepiete "goplaces";
-    bird = stepiete "bird";
+    # Private repo - requires SSH authentication (tag v0.9.1)
+    bird = "git+ssh://git@github.com/yumesha/bird-x-twitter-cmdline.git?ref=${birdTag}";
     sonoscli = stepiete "sonoscli";
     imsg = stepiete "imsg";
   };

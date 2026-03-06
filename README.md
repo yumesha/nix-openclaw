@@ -493,7 +493,7 @@ The simplest setup:
 
     # Built-ins (tools + skills) shipped via nix-steipete-tools.
     plugins = [
-      { source = "github:openclaw/nix-steipete-tools?dir=tools/summarize"; }
+      { source = "github:yumesha/nix-steipete-tools?dir=tools/summarize"; }
     ];
   };
 }
@@ -542,8 +542,8 @@ Uses `instances.default` to unlock per-group mention rules. If `instances` is se
       # Plugins (prod: pinned GitHub). Built-ins are via nix-steipete-tools.
       # MVP target: repo pointers resolve to tools + skills automatically.
       plugins = [
-        { source = "github:openclaw/nix-steipete-tools?dir=tools/oracle"; }
-        { source = "github:openclaw/nix-steipete-tools?dir=tools/peekaboo"; }
+        { source = "github:yumesha/nix-steipete-tools?dir=tools/oracle"; }
+        { source = "github:yumesha/nix-steipete-tools?dir=tools/peekaboo"; }
         { source = "github:joshp123/xuezh"; }
         {
           source = "github:joshp123/padel-cli";

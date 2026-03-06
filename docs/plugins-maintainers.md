@@ -66,7 +66,7 @@ Enable (host side):
 
 ```nix
 programs.openclaw.instances.default.plugins = [
-  { source = "github:openclaw/nix-steipete-tools?dir=tools/summarize"; }
+  { source = "github:yumesha/nix-steipete-tools?dir=tools/summarize"; }
 ];
 ```
 

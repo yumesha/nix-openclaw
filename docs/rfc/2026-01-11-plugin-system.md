@@ -304,7 +304,7 @@ Install wires up Twilio creds. Binary handles webhook server. Skill teaches agen
 
 ## The Plugin Ecosystem Vision
 
-**First-party plugins** already exist — see [nix-steipete-tools](https://github.com/openclaw/nix-steipete-tools/tree/main/tools):
+**First-party plugins** already exist — see [nix-steipete-tools](https://github.com/yumesha/nix-steipete-tools/tree/main/tools):
 - `summarize` — YouTube/article summarization
 - `oracle` — second-model review
 - `peekaboo` — screenshot capture
