@@ -13,7 +13,7 @@
     flake-utils.url = "github:numtide/flake-utils";
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
-    nix-steipete-tools.url = "github:yumesha/nix-steipete-tools";
+    nix-steipete-tools.url = "git+ssh://git@github.com/yumesha/nix-steipete-tools.git";
   };
 
   outputs = { self, nixpkgs, flake-utils, home-manager, nix-steipete-tools }:
