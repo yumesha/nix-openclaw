@@ -45,7 +45,7 @@
   bird = {
     tool = "bird";
     description = "Twitter/X integration";
-    linux = false;
+    linux = true;
   };
 
   sonoscli = {
