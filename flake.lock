@@ -61,11 +61,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1774109519,
-        "narHash": "sha256-kYZmMVvK8Y3VQYwad4VssgYuW7CbV1cvwzMEemfJgSw=",
+        "lastModified": 1774109735,
+        "narHash": "sha256-F2sWkeuVEW0STQ0KZK670DVh+jHYk9sUGxdis0o1UXc=",
         "ref": "refs/heads/main",
-        "rev": "b5f1a9b52a417d2e4266b871df49668a26a7e490",
-        "revCount": 104,
+        "rev": "d7cd6e5bf9f66854bf1be9b83e400c139bb95124",
+        "revCount": 105,
         "type": "git",
         "url": "ssh://git@github.com/yumesha/nix-steipete-tools.git"
       },
