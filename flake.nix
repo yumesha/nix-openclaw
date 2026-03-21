@@ -7,6 +7,7 @@
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     nix-steipete-tools.url = "github:openclaw/nix-steipete-tools";
+    nix-steipete-tools.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
