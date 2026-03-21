@@ -1,6 +1,7 @@
 {
   pkgs,
   steipetePkgs ? { },
+  yumeshaPkgs ? { },
   toolNamesOverride ? null,
   excludeToolNames ? [ ],
 }:
@@ -16,12 +17,18 @@ let
       if lib.meta.availableOn pkgs.stdenv.hostPlatform pkg then pkg else null
     else
       null;
+
+  # Priority: yumeshaPkgs > steipetePkgs > pkgs
   pick =
     name:
     let
+      fromYumesha = pickFrom yumeshaPkgs name;
       fromSteipete = pickFrom steipetePkgs name;
     in
-    if fromSteipete != null then fromSteipete else pickFrom pkgs name;
+    if fromYumesha != null then fromYumesha
+    else if fromSteipete != null then fromSteipete
+    else pickFrom pkgs name;
+
   ensure = names: safe (map pick names);
 
   baseNames = [

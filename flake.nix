@@ -8,6 +8,12 @@
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     nix-steipete-tools.url = "github:openclaw/nix-steipete-tools";
     nix-steipete-tools.inputs.nixpkgs.follows = "nixpkgs";
+
+    # Yumesha custom tools (private repos)
+    bird-src = {
+      url = "git+ssh://git@github.com/yumesha/bird-x-twitter-cmdline.git";
+      flake = false;
+    };
   };
 
   outputs =
@@ -17,6 +23,7 @@
       flake-utils,
       home-manager,
       nix-steipete-tools,
+      bird-src,
     }:
     let
       overlay = import ./nix/overlay.nix;
@@ -38,10 +45,20 @@
             nix-steipete-tools.packages.${system}
           else
             { };
+
+        # Yumesha custom tools (separate from steipete)
+        yumeshaPkgs = {
+          bird = import ./nix/tools/bird.nix {
+            inherit pkgs;
+            birdSrc = bird-src;
+          };
+        };
+
         packageSetStable = import ./nix/packages {
           pkgs = pkgs;
           sourceInfo = sourceInfoStable;
           steipetePkgs = steipetePkgs;
+          yumeshaPkgs = yumeshaPkgs;
         };
       in
       {
@@ -53,7 +70,9 @@
 
         packages = packageSetStable // {
           default = packageSetStable.openclaw;
-        };
+          # Export tool packages for external use
+          inherit (steipetePkgs) sag summarize sonoscli gogcli camsnap goplaces;
+        } // yumeshaPkgs;
 
         apps = {
           openclaw = flake-utils.lib.mkApp { drv = packageSetStable.openclaw-gateway; };

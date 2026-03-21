@@ -2,6 +2,7 @@
   pkgs,
   sourceInfo ? import ../sources/openclaw-source.nix,
   steipetePkgs ? { },
+  yumeshaPkgs ? { },
   toolNamesOverride ? null,
   excludeToolNames ? [ ],
 }:
@@ -10,6 +11,7 @@ let
   toolSets = import ../tools/extended.nix {
     pkgs = pkgs;
     steipetePkgs = steipetePkgs;
+    yumeshaPkgs = yumeshaPkgs;
     inherit toolNamesOverride excludeToolNames;
   };
   openclawGateway = pkgs.callPackage ./openclaw-gateway.nix {
