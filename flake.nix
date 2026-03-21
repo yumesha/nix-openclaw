@@ -14,6 +14,10 @@
       url = "git+ssh://git@github.com/yumesha/bird-x-twitter-cmdline.git";
       flake = false;
     };
+    discrawl-src = {
+      url = "github:yumesha/discrawl";
+      flake = false;
+    };
   };
 
   outputs =
@@ -24,6 +28,7 @@
       home-manager,
       nix-steipete-tools,
       bird-src,
+      discrawl-src,
     }:
     let
       overlay = import ./nix/overlay.nix;
@@ -51,6 +56,10 @@
           bird = import ./nix/tools/bird.nix {
             inherit pkgs;
             birdSrc = bird-src;
+          };
+          discrawl = import ./nix/tools/discrawl.nix {
+            inherit pkgs;
+            discrawlSrc = discrawl-src;
           };
         };
 
