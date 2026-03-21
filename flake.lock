@@ -59,17 +59,17 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1773283011,
-        "narHash": "sha256-bRsRSdy2Wez2zUWZha6wYCcNwcUyYAOtP4/GOX4htLw=",
-        "owner": "openclaw",
-        "repo": "nix-steipete-tools",
-        "rev": "526067c585ede853ebd16172bb8a461ccc1df55c",
-        "type": "github"
+        "lastModified": 1774109735,
+        "narHash": "sha256-F2sWkeuVEW0STQ0KZK670DVh+jHYk9sUGxdis0o1UXc=",
+        "ref": "refs/heads/main",
+        "rev": "d7cd6e5bf9f66854bf1be9b83e400c139bb95124",
+        "revCount": 105,
+        "type": "git",
+        "url": "ssh://git@github.com/yumesha/nix-steipete-tools.git"
       },
       "original": {
-        "owner": "openclaw",
-        "repo": "nix-steipete-tools",
-        "type": "github"
+        "type": "git",
+        "url": "ssh://git@github.com/yumesha/nix-steipete-tools.git"
       }
     },
     "nixpkgs": {

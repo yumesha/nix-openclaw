@@ -6,7 +6,8 @@
     flake-utils.url = "github:numtide/flake-utils";
     home-manager.url = "github:nix-community/home-manager";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
-    nix-steipete-tools.url = "github:openclaw/nix-steipete-tools";
+    nix-steipete-tools.url = "git+ssh://git@github.com/yumesha/nix-steipete-tools.git";
+    # Don't use follows - let it use its own pinned nixpkgs (16c7794d) for cached builds
 
     # Yumesha custom tools (private repos)
     bird-src = {
