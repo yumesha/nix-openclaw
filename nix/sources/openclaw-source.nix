@@ -4,6 +4,6 @@
   owner = "yumesha";
   repo = "openclaw";
   rev = "v2026.3.10";
-  hash = "sha256-WHO5vZUCk/I8fMEWJCJqrnnLmCBB/0ztgwh8+ZA6SGU=";
+  hash = "sha256-+UG41shNA8qHBeuBAcDZVA00SrIGlDtjQxkjKD3Lxks=";
   pnpmDepsHash = "sha256-CpgulfZfN1yHXpXBR1wvsSaME8y9ZX+dQQ4JJjp3PRs=";
 }
