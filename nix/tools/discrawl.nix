@@ -6,10 +6,10 @@
 
 pkgs.buildGoModule {
   pname = "discrawl";
-  version = "0.2.1";
+  version = "0.2.0";
   src = discrawlSrc;
 
-  vendorHash = null;  # use vendored deps from source
+  vendorHash = "sha256-RBTOknJVteiH7yXdmLzSWYHBAHnTHg9sg8XuQuk6iUE=";
 
   # Build the CLI binary
   subPackages = [ "cmd/discrawl" ];
@@ -22,19 +22,13 @@ pkgs.buildGoModule {
     sqlite
   ];
 
-  # Patch go.mod to lower Go version requirement (nixpkgs has 1.25.7, discrawl wants 1.26.1)
-  postPatch = ''
-    sed -i 's/go 1.26.1/go 1.25/' go.mod
-    sed -i 's/go 1.26/go 1.25/' go.mod
-  '';
-
   # CGO is needed for SQLite
   env.CGO_ENABLED = "1";
 
   ldflags = [
     "-s"
     "-w"
-    "-X main.version=0.2.1"
+    "-X main.version=0.2.0"
     "-X main.commit=nixbuild"
   ];
 
