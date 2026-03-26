@@ -19,11 +19,11 @@
     "discrawl-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1774545222,
+        "lastModified": 1774545704,
         "narHash": "sha256-Ox0wGNTvrIgY/ma9jFdrWXmBzw64+ug+1dzR7LGY2wE=",
         "owner": "yumesha",
         "repo": "discrawl",
-        "rev": "e2897c8bb33f4055d914c286384863d25551196f",
+        "rev": "e192c99accc3125f7251ef9d9f0a6a1c785c7495",
         "type": "github"
       },
       "original": {
