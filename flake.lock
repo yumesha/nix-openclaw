@@ -21,16 +21,16 @@
       "locked": {
         "lastModified": 1774545704,
         "narHash": "sha256-Ox0wGNTvrIgY/ma9jFdrWXmBzw64+ug+1dzR7LGY2wE=",
-        "owner": "yumesha",
-        "repo": "discrawl",
+        "ref": "refs/tags/v0.2.0",
         "rev": "e192c99accc3125f7251ef9d9f0a6a1c785c7495",
-        "type": "github"
+        "revCount": 52,
+        "type": "git",
+        "url": "ssh://git@github.com/yumesha/discrawl-private"
       },
       "original": {
-        "owner": "yumesha",
-        "ref": "v0.2.0",
-        "repo": "discrawl",
-        "type": "github"
+        "ref": "refs/tags/v0.2.0",
+        "type": "git",
+        "url": "ssh://git@github.com/yumesha/discrawl-private"
       }
     },
     "flake-utils": {
@@ -58,11 +58,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1773286336,
-        "narHash": "sha256-+yFtmhOHterllxWmV6YbdevTXpJdGS0mS0UmJ0k9fh0=",
+        "lastModified": 1774539458,
+        "narHash": "sha256-H9GIOqdMfQZ6lFetsQhO9TCq53hYzpTHDWOt3PRh9V0=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "7d06e0cefe6e4a1e85b2b3274dcb0b3da242a557",
+        "rev": "e2e5f512b33ed19a7a3271d0b73ed5eefcc0be5f",
         "type": "github"
       },
       "original": {
@@ -107,11 +107,11 @@
     },
     "nixpkgs_2": {
       "locked": {
-        "lastModified": 1773122722,
-        "narHash": "sha256-FIqHByVqxCprNjor1NqF80F2QQoiiyqanNNefdlvOg4=",
+        "lastModified": 1774386573,
+        "narHash": "sha256-4hAV26quOxdC6iyG7kYaZcM3VOskcPUrdCQd/nx8obc=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "62dc67aa6a52b4364dd75994ec00b51fbf474e50",
+        "rev": "46db2e09e1d3f113a13c0d7b81e2f221c63b8ce9",
         "type": "github"
       },
       "original": {

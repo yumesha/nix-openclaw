@@ -15,7 +15,7 @@
       flake = false;
     };
     discrawl-src = {
-      url = "github:yumesha/discrawl/v0.2.0";
+      url = "git+ssh://git@github.com/yumesha/discrawl-private?ref=refs/tags/v0.2.0";
       flake = false;
     };
   };
@@ -77,11 +77,21 @@
           };
         };
 
-        packages = packageSetStable // {
-          default = packageSetStable.openclaw;
-          # Export tool packages for external use
-          inherit (steipetePkgs) sag summarize sonoscli gogcli camsnap goplaces;
-        } // yumeshaPkgs;
+        packages =
+          packageSetStable
+          // {
+            default = packageSetStable.openclaw;
+            # Export tool packages for external use
+            inherit (steipetePkgs)
+              sag
+              summarize
+              sonoscli
+              gogcli
+              camsnap
+              goplaces
+              ;
+          }
+          // yumeshaPkgs;
 
         apps = {
           openclaw = flake-utils.lib.mkApp { drv = packageSetStable.openclaw-gateway; };
