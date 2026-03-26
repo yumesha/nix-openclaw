@@ -6,10 +6,10 @@
 
 pkgs.buildGoModule {
   pname = "discrawl";
-  version = "0.2.0";
+  version = "0.2.1";
   src = discrawlSrc;
 
-  vendorHash = "sha256-bgi0gR9b2bwGahxTz/h6L+ozc+7SmIYlTiH+/pwig3w=";
+  vendorHash = null;  # use vendored deps from source
 
   # Build the CLI binary
   subPackages = [ "cmd/discrawl" ];
@@ -34,7 +34,7 @@ pkgs.buildGoModule {
   ldflags = [
     "-s"
     "-w"
-    "-X main.version=0.2.0"
+    "-X main.version=0.2.1"
     "-X main.commit=nixbuild"
   ];
 

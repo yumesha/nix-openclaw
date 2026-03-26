@@ -15,7 +15,7 @@
       flake = false;
     };
     discrawl-src = {
-      url = "github:yumesha/discrawl";
+      url = "github:yumesha/discrawl/v0.2.1";
       flake = false;
     };
   };

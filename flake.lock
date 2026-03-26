@@ -19,15 +19,16 @@
     "discrawl-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1774024029,
-        "narHash": "sha256-KuUA5I5ZpYnrkS+kkm9iTVTmd1mj2VLNpcMsRWqyvyM=",
+        "lastModified": 1774544437,
+        "narHash": "sha256-561QZ/y2WwCGGb3TOwa/+us9aYwbzjIvRci4Avn/xNE=",
         "owner": "yumesha",
         "repo": "discrawl",
-        "rev": "ed57c41a7018b33db2a81e2fbff7397448b13ccb",
+        "rev": "ae08b18d87ce100604bec1347dbca7ecd2175f1c",
         "type": "github"
       },
       "original": {
         "owner": "yumesha",
+        "ref": "v0.2.1",
         "repo": "discrawl",
         "type": "github"
       }
