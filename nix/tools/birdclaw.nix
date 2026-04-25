@@ -9,11 +9,10 @@ let
   version = "0.1.0";
   pname = "birdclaw";
 
-  # Placeholder hash — run `nix build` to get the correct one from the error
   pnpmDeps = pnpm.fetchDeps {
     inherit pname version;
     src = birdclawSrc;
-    hash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+    hash = "sha256-YBHLdr9da6LhIawMdv4oofMAFmQ/v1I11EtJcJ2KRys=";
     fetcherVersion = 3;
   };
 in

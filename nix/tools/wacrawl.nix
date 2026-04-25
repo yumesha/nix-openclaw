@@ -9,8 +9,7 @@ pkgs.buildGoModule {
   version = "0.1.0";
   src = wacrawlSrc;
 
-  # Placeholder hash — run `nix build` to get the correct one from the error
-  vendorHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+  vendorHash = "sha256-9bIchqVYAqR3JEHb5RG2wOE7mMRiSBSIOXho5wxBn4E=";
 
   # Build the CLI binary
   subPackages = [ "cmd/wacrawl" ];
