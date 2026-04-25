@@ -18,6 +18,14 @@
       url = "git+ssh://git@github.com/yumesha/discrawl-private?ref=refs/tags/v0.2.0";
       flake = false;
     };
+    wacrawl-src = {
+      url = "github:yumesha/wacrawl";
+      flake = false;
+    };
+    birdclaw-src = {
+      url = "github:steipete/birdclaw";
+      flake = false;
+    };
   };
 
   outputs =
@@ -29,6 +37,8 @@
       nix-steipete-tools,
       bird-src,
       discrawl-src,
+      wacrawl-src,
+      birdclaw-src,
     }:
     let
       overlay = import ./nix/overlay.nix;
@@ -60,6 +70,14 @@
           discrawl = import ./nix/tools/discrawl.nix {
             inherit pkgs;
             discrawlSrc = discrawl-src;
+          };
+          wacrawl = import ./nix/tools/wacrawl.nix {
+            inherit pkgs;
+            wacrawlSrc = wacrawl-src;
+          };
+          birdclaw = import ./nix/tools/birdclaw.nix {
+            inherit pkgs;
+            birdclawSrc = birdclaw-src;
           };
         };
 
