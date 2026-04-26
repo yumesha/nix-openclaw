@@ -1,4 +1,5 @@
 # birdclaw - X/Twitter archive/inbox (TypeScript/pnpm project)
+# Note: This is a web app + CLI hybrid. The CLI runs from source via tsx.
 {
   pkgs,
   birdclawSrc,
@@ -29,18 +30,23 @@ pkgs.stdenv.mkDerivation {
 
   inherit pnpmDeps;
 
-  buildPhase = ''
-    runHook preBuild
-    pnpm run build
-    runHook postBuild
-  '';
+  # Don't build — the CLI runs from TypeScript source via tsx
+  dontBuild = true;
 
   installPhase = ''
     runHook preInstall
-    mkdir -p $out/bin $out/lib/birdclaw
-    cp -r dist/* $out/lib/birdclaw/
-    makeWrapper ${pkgs.nodejs_22}/bin/node $out/bin/birdclaw \
-      --add-flags "$out/lib/birdclaw/index.js"
+
+    # Install node_modules for production
+    mkdir -p $out/lib/birdclaw
+    cp -r . $out/lib/birdclaw/
+
+    # Create wrapper script that runs CLI from source
+    mkdir -p $out/bin
+    makeWrapper ${pkgs.nodejs_22}/bin/npx $out/bin/birdclaw \
+      --add-flags "tsx" \
+      --add-flags "$out/lib/birdclaw/src/cli.ts" \
+      --set "HOME" "$out/lib/birdclaw"
+
     runHook postInstall
   '';
 
