@@ -26,6 +26,10 @@
       url = "github:steipete/birdclaw";
       flake = false;
     };
+    xurl-src = {
+      url = "github:xdevplatform/xurl";
+      flake = false;
+    };
   };
 
   outputs =
@@ -39,6 +43,7 @@
       discrawl-src,
       wacrawl-src,
       birdclaw-src,
+      xurl-src,
     }:
     let
       overlay = import ./nix/overlay.nix;
@@ -78,6 +83,10 @@
           birdclaw = import ./nix/tools/birdclaw.nix {
             inherit pkgs;
             birdclawSrc = birdclaw-src;
+          };
+          xurl = import ./nix/tools/xurl.nix {
+            inherit pkgs;
+            xurlSrc = xurl-src;
           };
         };
 
