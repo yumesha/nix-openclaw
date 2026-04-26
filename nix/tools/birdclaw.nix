@@ -42,7 +42,7 @@ pkgs.stdenv.mkDerivation {
 
     # Create wrapper script that runs CLI from source
     mkdir -p $out/bin
-    makeWrapper $out/lib/birdclaw/node_modules/.bin/tsx $out/bin/birdclaw \
+    makeWrapper ${pkgs.tsx}/bin/tsx $out/bin/birdclaw \
       --add-flags "$out/lib/birdclaw/src/cli.ts" \
       --set "HOME" "/tmp/birdclaw-home"
 
