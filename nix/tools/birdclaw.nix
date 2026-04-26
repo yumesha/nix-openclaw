@@ -42,10 +42,9 @@ pkgs.stdenv.mkDerivation {
 
     # Create wrapper script that runs CLI from source
     mkdir -p $out/bin
-    makeWrapper ${pkgs.nodejs_22}/bin/npx $out/bin/birdclaw \
-      --add-flags "tsx" \
+    makeWrapper $out/lib/birdclaw/node_modules/.bin/tsx $out/bin/birdclaw \
       --add-flags "$out/lib/birdclaw/src/cli.ts" \
-      --set "HOME" "$out/lib/birdclaw"
+      --set "HOME" "/tmp/birdclaw-home"
 
     runHook postInstall
   '';
