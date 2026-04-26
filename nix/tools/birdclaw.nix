@@ -43,8 +43,8 @@ pkgs.stdenv.mkDerivation {
     # Create wrapper script that runs CLI from source
     mkdir -p $out/bin
     makeWrapper ${pkgs.tsx}/bin/tsx $out/bin/birdclaw \
-      --run "cd '$out/lib/birdclaw'" \
-      --add-flags "src/cli.ts" \
+      --add-flags "--tsconfig $out/lib/birdclaw/tsconfig.json" \
+      --add-flags "$out/lib/birdclaw/src/cli.ts" \
       --set "HOME" "/tmp/birdclaw-home"
 
     runHook postInstall
