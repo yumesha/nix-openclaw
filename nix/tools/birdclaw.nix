@@ -31,6 +31,12 @@ pkgs.stdenv.mkDerivation {
 
   inherit pnpmDeps;
 
+  # birdclaw hardcodes ~/Projects/bird/bird as the bird companion tool path.
+  # Patch it to just "bird" so it resolves from PATH (where nix puts it).
+  postPatch = ''
+    sed -i 's|path.join(os.homedir(), "Projects", "bird", "bird")|"bird"|g' src/lib/config.ts
+  '';
+
   # pnpm.configHook installs JS deps during configure, but better-sqlite3's
   # install script (prebuild-install || node-gyp rebuild) may silently fail.
   # prebuild-install has no network in sandbox; node-gyp needs Python and
@@ -51,10 +57,12 @@ pkgs.stdenv.mkDerivation {
 
     # Create wrapper script that runs CLI from source
     mkdir -p $out/bin
+    # birdclaw stores its database in ~/.birdclaw/ and looks for the
+    # 'bird' companion tool at ~/Projects/bird/bird by default. Don't
+    # override HOME — let it use the caller's real home directory.
     makeWrapper ${pkgs.tsx}/bin/tsx $out/bin/birdclaw \
       --add-flags "--tsconfig $out/lib/birdclaw/tsconfig.json" \
-      --add-flags "$out/lib/birdclaw/src/cli.ts" \
-      --set "HOME" "/tmp/birdclaw-home"
+      --add-flags "$out/lib/birdclaw/src/cli.ts"
 
     runHook postInstall
   '';
