@@ -26,12 +26,19 @@ pkgs.stdenv.mkDerivation {
     pnpm.configHook
     pkgs.nodejs_22
     pkgs.makeWrapper
+    pkgs.python3  # required for node-gyp (better-sqlite3 native build)
   ];
 
   inherit pnpmDeps;
 
-  # Don't build — the CLI runs from TypeScript source via tsx
-  dontBuild = true;
+  # pnpm.configHook installs JS deps during configure, but better-sqlite3's
+  # install script (prebuild-install || node-gyp rebuild) may silently fail
+  # because node-gyp requires Python. Explicitly rebuild it here.
+  buildPhase = ''
+    runHook preBuild
+    pnpm rebuild better-sqlite3
+    runHook postBuild
+  '';
 
   installPhase = ''
     runHook preInstall
