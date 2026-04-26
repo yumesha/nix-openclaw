@@ -32,10 +32,12 @@ pkgs.stdenv.mkDerivation {
   inherit pnpmDeps;
 
   # pnpm.configHook installs JS deps during configure, but better-sqlite3's
-  # install script (prebuild-install || node-gyp rebuild) may silently fail
-  # because node-gyp requires Python. Explicitly rebuild it here.
+  # install script (prebuild-install || node-gyp rebuild) may silently fail.
+  # prebuild-install has no network in sandbox; node-gyp needs Python and
+  # local Node.js headers (npm_config_nodedir) because it can't download them.
   buildPhase = ''
     runHook preBuild
+    export npm_config_nodedir="${pkgs.nodejs_22}"
     pnpm rebuild better-sqlite3
     runHook postBuild
   '';
